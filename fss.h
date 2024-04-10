@@ -2,11 +2,11 @@
 #define __FSS_H__
 
 // Program Constants
-#define nsteps   10000
+#define nsteps   5000
 #define savefreq 10
-#define density  0.0005
+#define density  0.05
 #define Wscale   5000
-#define dt       0.0005
+#define dt       0.01
 
 // Fish Data Structure
 typedef struct fish_t {

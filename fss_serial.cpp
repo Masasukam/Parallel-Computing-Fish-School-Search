@@ -1,6 +1,7 @@
 #include "fss.h"
 #include <cmath>
 
+// what do they mean
 double cfvalnx, cfvalny, cfvald; // numerator and denominator of collective movement
 
 // benchmark function
@@ -9,14 +10,15 @@ double f(double x, double y) {
 }
 
 void individual_move(fish_t& i) {
-    double next_fval = f(i.x + i.vx, i.y + i.vy);
-    if (next_fval < i.fval) {
-    	i.ax = -i.vx / dt;
+    double next_fval = f(i.x + i.vx * dt, i.y + i.vy * dt); // units mismatch
+    if (next_fval < i.fval) {   // fval at step 0 initialized in main
+    	i.ax = -i.vx / dt;  // Setting acceleration to 0
     	i.ay = -i.vy / dt;
     }
     else {
     	i.ax = i.ay = 0;
     }
+
     cfvalnx += i.vx * (next_fval - i.fval);
     cfvalny += i.vy * (next_fval - i.fval);
     cfvald += fabs(next_fval - i.fval);
