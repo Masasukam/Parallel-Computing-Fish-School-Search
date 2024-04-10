@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 x = np.linspace(0, 10, 100)  # X-coordinates
 y = np.linspace(0, 10, 100)  # Y-coordinates
 X, Y = np.meshgrid(x, y)     # Create a grid of X and Y values
-Z = np.sin(np.sqrt(X**2 + Y**2))
+# Z = np.sin(np.sqrt(X**2 + Y**2))
+Z = ((X - 5) ** 2)+ ((Y - 5) ** 2)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')

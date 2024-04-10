@@ -141,6 +141,7 @@ int main(int argc, char** argv) {
 
     // Finalize
     std::cout << "Simulation Time = " << seconds << " seconds for " << nfish << " fish.\n";
+    std::cout << "Board Size = " << size << "\n";
     fsave.close();
     delete[] fish;
 }

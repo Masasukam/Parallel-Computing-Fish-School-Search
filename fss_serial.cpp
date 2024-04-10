@@ -1,12 +1,14 @@
 #include "fss.h"
 #include <cmath>
+#include <iostream>
 
 // what do they mean
 double cfvalnx, cfvalny, cfvald; // numerator and denominator of collective movement
 
 // benchmark function
 double f(double x, double y) {
-	return sin(sqrt(x * x + y * y));
+	// return sin(sqrt(x * x + y * y));
+    return ((x - 3.5) * (x-3.5))+ ((y - 3.5) * (y - 3.5));
 }
 
 void individual_move(fish_t& i) {
@@ -22,12 +24,14 @@ void individual_move(fish_t& i) {
     cfvalnx += i.vx * (next_fval - i.fval);
     cfvalny += i.vy * (next_fval - i.fval);
     cfvald += fabs(next_fval - i.fval);
-    i.weight += (next_fval - i.fval) / fabs(next_fval - i.fval); // problematic
-    i.weight = fmax(1, i.weight);
-    i.weight = fmin(Wscale, i.weight);
+
+    // i.weight += (next_fval - i.fval) / fabs(next_fval - i.fval); // problematic
+    // i.weight = fmax(1, i.weight);
+    // i.weight = fmin(Wscale, i.weight);
 }
 
 void collective_move(fish_t& i) {
+    if (cfvald < 1e-10) std::cout << "1\n";
 	i.ax += cfvalnx / cfvald;
 	i.ay += cfvalny / cfvald;
 }

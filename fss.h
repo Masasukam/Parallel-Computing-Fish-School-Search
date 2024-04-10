@@ -2,7 +2,7 @@
 #define __FSS_H__
 
 // Program Constants
-#define nsteps   5000
+#define nsteps   3500
 #define savefreq 10
 #define density  0.05
 #define Wscale   5000
