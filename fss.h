@@ -6,7 +6,8 @@
 #define savefreq 10
 #define density  0.05
 #define Wscale   5000
-#define dt       0.01
+#define dt       0.005
+#define vmax     2.0
 
 // Fish Data Structure
 typedef struct fish_t {
