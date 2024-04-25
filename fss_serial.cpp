@@ -3,6 +3,7 @@
 #include <iostream>
 
 #define MIN(x, y) (x < y ? x : y)
+#define SQR(x) ((x) * (x))
 
 int t;
 double cfvalnx, cfvalny, cfvald; // numerator and denominator of collective movement
@@ -14,9 +15,15 @@ double f(double x, double y) {
     return sin(0.01 * x * x + 0.005 * y * y - 0.05 * x + 2 * sin(0.01 * t));
 }
 
+// Function to calculate distance between two fishes
+double distanceSquared(const fish_t &fish1, const fish_t &fish2) {
+    return SQR(fish1.x - fish2.x) + SQR(fish1.y - fish2.y);
+}
+
+// Todo0: individual fish distances
 void individual_move(fish_t& i) {
     i.fval = f(i.x, i.y);
-    double next_fval = f(i.x + i.vx * dt, i.y + i.vy * dt); // units mismatch
+    double next_fval = f(i.x + i.vx * dt, i.y + i.vy * dt);
     if (next_fval < i.fval) {   // fval at step 0 initialized in main
     	i.ax = - i.vx / dt;  // Setting velocity to 0
     	i.ay = - i.vy / dt;
@@ -30,15 +37,37 @@ void individual_move(fish_t& i) {
     cfvalny += i.vy * (next_fval - i.fval);
     cfvald += fabs(next_fval - i.fval);
 
+    // Todo 1: Add weight features
     // i.weight += (next_fval - i.fval) / fabs(next_fval - i.fval); // problematic
     // i.weight = fmax(1, i.weight);
     // i.weight = fmin(Wscale, i.weight);
 }
 
-void collective_move(fish_t& i) {
-    if (cfvald < 1e-10) std::cout << "1\n";
-	i.ax += cfvalnx / cfvald;
-	i.ay += cfvalny / cfvald;
+
+// Todo2: within group distance
+void collective_move(fish_t& i, fish_t* fishes, int nfish) {
+    double cutoffSquared = SQR(cutoff);
+    double totalAdjustmentX = 0.0;
+    double totalAdjustmentY = 0.0;
+    int count = 0;
+
+    for (int j = 0; j < nfish; ++j) {
+        if (&i != &fishes[j]) { // Skip self-comparison
+            double distSquared = distanceSquared(i, fishes[j]);
+            if (distSquared < cutoffSquared) {
+                double adjustmentX = i.x - fishes[j].x;
+                double adjustmentY = i.y - fishes[j].y;
+                totalAdjustmentX += adjustmentX;
+                totalAdjustmentY += adjustmentY;
+                count++;
+            }
+        }
+    }
+
+    if (count > 0) {
+        i.ax += totalAdjustmentX / count;
+        i.ay += totalAdjustmentY / count;
+    }
 }
 
 // Integrate the ODE
@@ -80,9 +109,13 @@ void simulate_one_step(fish_t* fish, int nfish, double size) {
     	individual_move(fish[i]);
     }
 
-    for (int i = 0; i < nfish; ++ i) {
-    	collective_move(fish[i]);
+    // for (int i = 0; i < nfish; ++ i) {
+    // 	collective_move(fish[i]);
+    // }
+    for (int i = 0; i < nfish; ++i) {
+        collective_move(fish[i], fish, nfish);
     }
+
 
     // Move fish
     for (int i = 0; i < nfish; ++i) {
