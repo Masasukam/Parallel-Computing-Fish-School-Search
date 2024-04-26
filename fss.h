@@ -8,7 +8,7 @@
 #define Wscale   5000
 #define dt       0.005
 #define vmax     2.0
-#define cutoff   0.001
+#define cutoff   10
 
 
 // Fish Data Structure
