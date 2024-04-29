@@ -4,11 +4,12 @@
 // Program Constants
 #define nsteps   3500
 #define savefreq 10
-#define density  0.05
-#define Wscale   5000
-#define dt       0.005
-#define vmax     2.0
-#define cutoff   10
+#define density  0.1
+// #define Wscale   5000
+#define dt       0.02
+#define vmax     1.0
+#define retrynum 10
+#define cutoff   0.1
 
 
 // Fish Data Structure

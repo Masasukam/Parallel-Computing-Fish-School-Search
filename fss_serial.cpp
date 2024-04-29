@@ -1,9 +1,15 @@
 #include "fss.h"
 #include <cmath>
+#include <random>
 #include <iostream>
 
 #define MIN(x, y) (x < y ? x : y)
 #define SQR(x) ((x) * (x))
+
+// random number generator
+std::random_device rd;
+std::mt19937 gen(1);
+std::uniform_real_distribution<float> rand_real(-1.0, 1.0);
 
 int t;
 double cfvalnx, cfvalny, cfvald; // numerator and denominator of collective movement
@@ -12,7 +18,8 @@ double cfvalnx, cfvalny, cfvald; // numerator and denominator of collective move
 double f(double x, double y) {
 	// return sin(sqrt(x * x + y * y));
     // return ((x - 3.5) * (x-3.5))+ ((y - 3.5) * (y - 3.5));
-    return sin(0.01 * x * x + 0.005 * y * y - 0.05 * x + 2 * sin(0.01 * t));
+    // return sin(0.01 * x * x + 0.005 * y * y - 0.05 * x + 2 * sin(0.01 * t));
+    return sin(0.01 * x * x + 0.005 * y * y - 0.05 * x + 2 * sin(0.005 * t));
 }
 
 // Function to calculate distance between two fishes
@@ -23,14 +30,18 @@ double distanceSquared(const fish_t &fish1, const fish_t &fish2) {
 // Todo0: individual fish distances
 void individual_move(fish_t& i) {
     i.fval = f(i.x, i.y);
-    double next_fval = f(i.x + i.vx * dt, i.y + i.vy * dt);
-    if (next_fval < i.fval) {   // fval at step 0 initialized in main
-    	i.ax = - i.vx / dt;  // Setting velocity to 0
-    	i.ay = - i.vy / dt;
-        i.vx = i.vy = 0;
-    }
-    else {
-    	i.ax = i.ay = 0;
+    i.ax = i.ay = 0;
+    
+    double next_fval = f(i.x, i.y);
+    double newvx, newvy;
+    for (int j = 0; j < retrynum; ++ j) {
+        newvx = rand_real(gen);
+        newvy = rand_real(gen);
+        if (f(i.x + newvx * dt, i.y + newvy * dt) > next_fval) {
+            next_fval = f(i.x + i.vx * dt, i.y + i.vy * dt);
+            i.vx = newvx;
+            i.vy = newvy;
+        }
     }
 
     cfvalnx += i.vx * (next_fval - i.fval);
@@ -57,8 +68,8 @@ void collective_move(fish_t& i, fish_t* fishes, int nfish) {
             if (distSquared < cutoffSquared) {
                 double adjustmentX = i.x - fishes[j].x;
                 double adjustmentY = i.y - fishes[j].y;
-                totalAdjustmentX += adjustmentX;
-                totalAdjustmentY += adjustmentY;
+                totalAdjustmentX += cutoff - adjustmentX;
+                totalAdjustmentY += cutoff - adjustmentY;
                 count++;
             }
         }
@@ -78,8 +89,26 @@ void move_fish(fish_t& i, double size) {
     i.vx = MIN(i.vx, vmax);
     i.vy += i.ay * dt;
     i.vy = MIN(i.vy, vmax);
+
+    // make sure that every fish will move
+    if (fabs(i.vx) < 1e-3 && fabs(i.vy) < 1e-3) {
+        double bestfval = f(i.x, i.y);
+        double newvx, newvy;
+        for (int j = 0; j < retrynum; ++ j) {
+            newvx = rand_real(gen);
+            newvy = rand_real(gen);
+            if (f(i.x + newvx * dt, i.y + newvy * dt) > bestfval) {
+                bestfval = f(i.x + i.vx * dt, i.y + i.vy * dt);
+                i.vx = newvx;
+                i.vy = newvy;
+            }
+        }
+    }
+
+
     i.x += i.vx * dt;
     i.y += i.vy * dt;
+
 
     // Bounce from walls
     while (i.x < 0 || i.x > size) {

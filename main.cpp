@@ -32,8 +32,8 @@ void init_fish(fish_t* fish, int nfish, double size, int fish_seed) {
     std::random_device rd;
     std::mt19937 gen(fish_seed ? fish_seed : rd());
 
-    int sx = (int)ceil(sqrt((double)nfish));
-    int sy = (nfish + sx - 1) / sx;
+    // int sx = (int)ceil(sqrt((double)nfish));
+    // int sy = (nfish + sx - 1) / sx;
 
     std::vector<int> shuffle(nfish);
     for (int i = 0; i < (int)shuffle.size(); ++i) {
@@ -44,19 +44,24 @@ void init_fish(fish_t* fish, int nfish, double size, int fish_seed) {
         // Make sure particles are not spatially sorted
         std::uniform_int_distribution<int> rand_int(0, nfish - i - 1);
         int j = rand_int(gen);
-        int k = shuffle[j];
+        // int k = shuffle[j];
         shuffle[j] = shuffle[nfish - i - 1];
 
         // Distribute particles evenly to ensure proper spacing
-        fish[i].x = size * (1. + (k % sx)) / (1 + sx);
-        fish[i].y = size * (1. + (k / sx)) / (1 + sy);
+        std::uniform_real_distribution<float> rand_pos(0, 1.0 * size);
+        fish[i].x = rand_pos(gen);
+        fish[i].y = rand_pos(gen);
+        // fish[i].x = size * (1. + (k % sx)) / (1 + sx);
+        // fish[i].y = size * (1. + (k / sx)) / (1 + sy);
         fish[i].fval = f(fish[i].x, fish[i].y);
-        fish[i].weight = Wscale / 2;
+        // fish[i].weight = Wscale / 2;
 
         // Assign random velocities within a bound
         std::uniform_real_distribution<float> rand_real(-1.0, 1.0);
         fish[i].vx = rand_real(gen);
         fish[i].vy = rand_real(gen);
+
+        // printf("fish %d: vx: %.2f   vy: %.2f\n", i, fish[i].vx, fish[i].vy); // for debugging
     }
 }
 
