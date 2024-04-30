@@ -16,8 +16,9 @@ double cfvalnx, cfvalny, cfvald; // numerator and denominator of collective move
 
 // benchmark function
 double f(double x, double y) {
-	// return sin(sqrt(x * x + y * y));
-    // return ((x - 3.5) * (x-3.5))+ ((y - 3.5) * (y - 3.5));
+    // return sin(sqrt(x * x + y * y));
+    // return - ((x - 5) * (x - 5)) - ((y - 5) * (y - 5));
+    // return (-1 + 2.0 * t / nsteps) * (((x - 5) * (x - 5)) + ((y - 5) * (y - 5)));
     // return sin(0.01 * x * x + 0.005 * y * y - 0.05 * x + 2 * sin(0.01 * t));
     return sin(0.01 * x * x + 0.005 * y * y - 0.05 * x + 2 * sin(0.005 * t));
 }

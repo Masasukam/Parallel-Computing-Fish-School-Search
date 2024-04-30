@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
+#include <cuda.h>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -53,7 +54,6 @@ void init_fish(fish_t* fish, int nfish, double size, int fish_seed) {
         fish[i].y = rand_pos(gen);
         // fish[i].x = size * (1. + (k % sx)) / (1 + sx);
         // fish[i].y = size * (1. + (k / sx)) / (1 + sy);
-        fish[i].fval = f(fish[i].x, fish[i].y);
         // fish[i].weight = Wscale / 2;
 
         // Assign random velocities within a bound
@@ -123,21 +123,29 @@ int main(int argc, char** argv) {
 
     init_fish(fish, nfish, size, fish_seed);
 
+    fish_t* fish_gpu;
+    cudaMalloc((void**)&fish_gpu, nfish * sizeof(fish_t));
+    cudaMemcpy(fish_gpu, fish, nfish * sizeof(fish_t), cudaMemcpyHostToDevice);
+
+
     // Algorithm
     auto start_time = std::chrono::steady_clock::now();
 
-    init_simulation(fish, nfish, size);
+    init_simulation(fish_gpu, nfish, size);
 
 
     for (int step = 0; step < nsteps; ++step) {
-        simulate_one_step(fish, nfish, size);
+        simulate_one_step(fish_gpu, nfish, size);
+        cudaDeviceSynchronize();
 
         // Save state if necessary
         if (fsave.good() && (step % savefreq) == 0) {
+            cudaMemcpy(fish, fish_gpu, nfish * sizeof(fish_t), cudaMemcpyDeviceToHost);
             save(fsave, fish, nfish, size);
         }
     }
 
+    cudaDeviceSynchronize();
     auto end_time = std::chrono::steady_clock::now();
 
     std::chrono::duration<double> diff = end_time - start_time;
@@ -147,5 +155,6 @@ int main(int argc, char** argv) {
     std::cout << "Simulation Time = " << seconds << " seconds for " << nfish << " fish.\n";
     std::cout << "Board Size = " << size << "\n";
     fsave.close();
+    cudaFree(fish_gpu);
     delete[] fish;
 }
