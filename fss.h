@@ -1,9 +1,6 @@
 #ifndef __FSS_H__
 #define __FSS_H__
 
-#include <cstdint>
-#include <mpi.h>
-
 // Program Constants
 #define nsteps   1000
 #define savefreq 10
@@ -17,7 +14,6 @@
 
 // Fish Data Structure
 typedef struct fish_t {
-    uint64_t id;   //particle ID
     double x, y;   // Position
     double vx, vy; // Velocity
     double ax, ay; // Acceleration
@@ -28,11 +24,8 @@ typedef struct fish_t {
 // Benchmark function
 double f(double x, double y);
 
-extern MPI_Datatype FISH;
-
 // Simulation routine
-void init_simulation(fish_t* fish, int nfish, double size, int rank, int num_procs);
-void simulate_one_step(fish_t* fish, int nfish, double size, int rank, int num_procs);
-void gather_for_save(fish_t* fish, int nfish, double size, int rank, int num_procs);
+void init_simulation(fish_t* fish, int nfish, double size);
+void simulate_one_step(fish_t* fish, int nfish, double size);
 
 #endif
