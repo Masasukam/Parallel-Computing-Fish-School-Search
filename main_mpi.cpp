@@ -1,4 +1,4 @@
-#include "fss_mpi.h"
+#include "fssmpi.h"
 #include <cmath>
 #include <cstring>
 #include <fstream>
