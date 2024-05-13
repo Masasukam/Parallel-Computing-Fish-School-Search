@@ -14,6 +14,7 @@
 
 // Fish Data Structure
 typedef struct fish_t {
+    uint64_t id;   //particle ID
     double x, y;   // Position
     double vx, vy; // Velocity
     double ax, ay; // Acceleration
