@@ -1,6 +1,9 @@
 #ifndef __FSS_H__
 #define __FSS_H__
 
+#include <cstdint>
+#include <mpi.h>
+
 // Program Constants
 #define nsteps   1000
 #define savefreq 10
@@ -28,5 +31,6 @@ double f(double x, double y);
 // Simulation routine
 void init_simulation(fish_t* fish, int nfish, double size);
 void simulate_one_step(fish_t* fish, int nfish, double size);
+void gather_for_save(particle_t* fish, int nfish, double size, int rank, int num_procs);
 
 #endif
