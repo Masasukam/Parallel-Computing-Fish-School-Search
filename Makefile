@@ -17,6 +17,9 @@ cuda: fss_cuda.cu main.cu
 	$(NVCC) -O3 fss_cuda.cu main.cu -o fss_cuda
 # 	./fss_cuda -s 1 -o output.txt
 
+openmp: fss_openmp.cpp main.cpp
+	$(CXX) fss_openmp.cpp main.cpp -o openmp -Wall -fopenmp
+
 gif: output.txt render.py
 	python3 render.py output.txt output.gif 0.05
 

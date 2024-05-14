@@ -128,13 +128,19 @@ int main(int argc, char** argv) {
 
     init_simulation(fish, nfish, size);
 
-
-    for (int step = 0; step < nsteps; ++step) {
-        simulate_one_step(fish, nfish, size);
-
-        // Save state if necessary
-        if (fsave.good() && (step % savefreq) == 0) {
-            save(fsave, fish, nfish, size);
+#ifdef _OPENMP
+#pragma omp parallel default(shared)
+#endif
+    {
+        for (int step = 0; step < nsteps; ++step) {
+            simulate_one_step(fish, nfish, size);
+#ifdef _OPENMP
+#pragma omp master
+#endif
+            // Save state if necessary
+            if (fsave.good() && (step % savefreq) == 0) {
+                save(fsave, fish, nfish, size);
+            }
         }
     }
 
